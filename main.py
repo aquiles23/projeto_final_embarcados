@@ -24,7 +24,7 @@ def state_message(client, userdata, message):
 
 broker = "mqtt.eclipseprojects.io"
 
-device = "fse2020/160010195/devices/<ID_do_device>"
+device = "fse2020/160010195/dispositivos/8c:aa:b5:8b:52:e0"
 devi_info = {
 	"room": "quarto",
 	"in": "interruptor",
@@ -38,8 +38,8 @@ client.connect(broker)
 if(not client.publish(device, json.dumps(devi_info["room"]), 2)):
 	print(f"Failed to send message to topic {device}")
 
-# wait for esp to publish in mqtt?
-# time.sleep(1)
+# wait for esp subscribe in mqtt?
+time.sleep(1)
 
 temp_topic = f"fse2020/160010195/{devi_info['room']}/temperatura"
 umid_topic = f"fse2020/160010195/{devi_info['room']}/umidade"
