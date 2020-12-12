@@ -12,13 +12,14 @@ def on_connect(client, userdata, flags, rc):
 
 
 def temp_message(client, userdata, message):
-	pass
+	print(json.loads(message))
 
 def umid_message(client, userdata, message):
-	pass
+	print(json.loads(message))
 
 def state_message(client, userdata, message):
-	pass
+	print(json.loads(message))
+
 
 # escolha = int(input("escolha 1 para adicionar novo device\n2 para tananan"))
 
