@@ -10,6 +10,8 @@ def on_connect(client, userdata, flags, rc):
 	else:
 		print("Failed to connect, return code %d\n", rc)
 
+def on_publish(client, userdata, mid):
+	print(f"publishing {client}; {userdata} ; {mid} ;")
 
 def temp_message(client, userdata, message):
 	print(json.loads(message))
@@ -34,13 +36,14 @@ devi_info = {
 
 client = mqtt.Client("publisher")
 client.on_connect = on_connect
+client.on_publish = on_publish
 client.connect(broker)
 
 if(not client.publish(device, json.dumps(devi_info["room"]), 2)):
 	print(f"Failed to send message to topic {device}")
 
 # wait for esp subscribe in mqtt?
-time.sleep(1)
+#time.sleep(1)
 
 temp_topic = f"fse2020/160010195/{devi_info['room']}/temperatura"
 umid_topic = f"fse2020/160010195/{devi_info['room']}/umidade"
@@ -53,3 +56,6 @@ client.message_callback_add(state_topic, state_message)
 client.subscribe(temp_topic)
 client.subscribe(umid_topic)
 client.subscribe(state_topic)
+
+# program will not shut down
+client.loop_forever()
