@@ -16,7 +16,8 @@ def input_str(screen, y_pos : int, lenght : int, instructions = "") -> str:
 	screen.nodelay(False)
 	curses.echo()
 	screen.addstr(y_pos - 1, 0, instructions)
-	string = screen.getstr(y_pos,0,lenght)
+	screen.refresh()
+	string = screen.getstr(y_pos, 0, lenght)
 	curses.noecho()
 	screen.nodelay(True)
 	return string
@@ -49,9 +50,10 @@ if __name__ == "__main__":
 							9,
 							1,
 							"digite seu estado(1 ou 0)")))
+				room_name = room_name.decode("utf-8")
 				room_devices.device_set(room_name, state)
 				with open("log.csv", "a") as fp:
-					fp.write(f"output, {room_name}, {state}")
+					fp.write(f"\noutput, {room_name}, {state}")
 			elif (flag == ord("3")):
 				pass
 			flag = screen.getch()
