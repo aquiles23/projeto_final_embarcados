@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 from sensor import sensor
-from room_devices import Room_devices
+from room_devices import RoomDevices
 import curses
 import time
-import sys
 
 
 def salutation(screen):
@@ -25,7 +24,7 @@ def input_str(screen, y_pos : int, lenght : int, instructions = "") -> str:
 
 if __name__ == "__main__":
 	try:
-		room_devices = Room_devices()
+		room_devices = RoomDevices()
 		screen = curses.initscr()
 		curses.noecho()
 		screen.nodelay(True)
@@ -34,12 +33,12 @@ if __name__ == "__main__":
 			
 			screen.clear()
 			salutation(screen)
+			room_devices.print_device(screen)
 
 			temp, hum = sensor()
 			screen.addstr(4, 0, f"cômodo central. Humidade: {hum} Temperatura {temp}")
 
 			if(flag == ord("1")):
-				#raise
 				pass
 			elif (flag == ord("2")):
 				room_name = input_str(screen, 7, 50,"digite o nome do cômodo")
