@@ -2,27 +2,27 @@
 import paho.mqtt.client as mqtt
 import json
 import time
-import sys
 
-def mqtt()
+global msg
+
+def mqtt():
 	def on_connect(client, userdata, flags, rc):
 		if rc == 0:
 			pass
 		else:
-			print("erro ao conectar")
-			sys.exit()
+			Exception("Failed to connect, return code %d\n", rc)
 
 	def on_publish(client, userdata, mid):
 		pass
 
 	def temp_message(client, userdata, message):
-		pass
+		msg = json.loads(message.payload.decode("utf-8"))
 
 	def umid_message(client, userdata, message):
-		pass
+		msg = json.loads(message.payload.decode("utf-8"))
 
 	def state_message(client, userdata, message):
-		pass
+		msg = json.loads(message.payload.decode("utf-8"))
 
 
 	# escolha = int(input("escolha 1 para adicionar novo device\n2 para tananan"))
@@ -42,7 +42,7 @@ def mqtt()
 	client.connect(broker)
 
 	if(not client.publish(device, json.dumps(devi_info["room"]), 2)):
-		pass
+		Exception(f"Failed to send message to topic {device}")
 
 	# wait for esp subscribe in mqtt?
 	#time.sleep(1)
