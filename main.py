@@ -41,7 +41,7 @@ if __name__ == "__main__":
 			if(flag == ord("1")):
 				pass
 			elif (flag == ord("2")):
-				room_name = input_str(screen, 7, 50,"digite o nome do cômodo")
+				room_name = input_str(screen, 7, 50, "digite o nome do cômodo")
 				state = bool(
 					int(
 						input_str(
@@ -51,8 +51,7 @@ if __name__ == "__main__":
 							"digite seu estado(1 ou 0)")))
 				room_name = room_name.decode("utf-8")
 				room_devices.device_set(room_name, state)
-				with open("log.csv", "a") as fp:
-					fp.write(f"\noutput, {room_name}, {state}")
+				
 			elif (flag == ord("3")):
 				pass
 			flag = screen.getch()
