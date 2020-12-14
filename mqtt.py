@@ -2,10 +2,13 @@
 import paho.mqtt.client as mqtt
 import json
 import time
+import curses
+from room_devices import RoomDevices
+
 
 global msg
 
-def mqtt():
+def mqtt(matricula= "160010195", mac="8c:aa:b5:8b:52:e0", room_devices: RoomDevices, screen):
 	def on_connect(client, userdata, flags, rc):
 		if rc == 0:
 			pass
@@ -22,14 +25,20 @@ def mqtt():
 		msg = json.loads(message.payload.decode("utf-8"))
 
 	def state_message(client, userdata, message):
-		msg = json.loads(message.payload.decode("utf-8"))
+		message = json.loads(message.payload.decode("utf-8"))
+		room_devices.total_device.update({message.get("device"):(
+			message.get("state"),
+			message.get("room"))})
+		room_devices.esp_in_device.update({message.get("device"):(
+			message.get("state"),
+			message.get("room"))})
 
 
 	# escolha = int(input("escolha 1 para adicionar novo device\n2 para tananan"))
 
 	broker = "mqtt.eclipseprojects.io"
 
-	device = "fse2020/160010195/dispositivos/8c:aa:b5:8b:52:e0"
+	device = f"fse2020/{matricula}/dispositivos/{mac}"
 	devi_info = {
 		"room": "quarto",
 		"in": "interruptor",
@@ -47,9 +56,9 @@ def mqtt():
 	# wait for esp subscribe in mqtt?
 	#time.sleep(1)
 
-	temp_topic = f"fse2020/160010195/{devi_info['room']}/temperatura"
-	umid_topic = f"fse2020/160010195/{devi_info['room']}/umidade"
-	state_topic = f"fse2020/160010195/{devi_info['room']}/estado"
+	temp_topic = f"fse2020/{matricula}/{devi_info['room']}/temperatura"
+	umid_topic = f"fse2020/{matricula}/{devi_info['room']}/umidade"
+	state_topic = f"fse2020/{matricula}/{devi_info['room']}/estado"
 
 	client.message_callback_add(temp_topic, temp_message)
 	client.message_callback_add(umid_topic, umid_message)

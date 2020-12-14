@@ -68,12 +68,6 @@ if __name__ == "__main__":
 
 	except Exception as err:
 		curses.endwin()
-		# polling.kill()
-		# time.sleep(0.2)
-		# polling.close()
 		raise err
 
 	curses.endwin()
-	# polling.kill()
-	# time.sleep(0.2)
-	# polling.close()

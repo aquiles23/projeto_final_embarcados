@@ -8,12 +8,17 @@ class RoomDevices():
 	alarm_handle : subprocess.Popen
 	inn : list
 	out : list
+	gpio_in_device : dict
+	esp_in_device : dict
+	gpio_out_device : dict
 	total_device : dict
+	
 	def __init__(self):
 		GPIO.setmode(GPIO.BCM)
 		self.out = [17, 18] 
 		self.inn = [25, 26, 5, 6, 12, 16]
 		self.total_device = {}
+		self.esp_in_device = {}
 		self.gpio_in_device = {
 			"sala": (25, "sensor_presenca_1"),
 			"cozinha": (26, "sensor_presenca_2"),
@@ -31,21 +36,27 @@ class RoomDevices():
 		GPIO.setup(self.out, GPIO.OUT)
 
 	def polling(self):
+		def alarm(room, state : int, device, first : bool):
+			if state:
+				with open("log.csv", "a") as fp:
+					fp.write(f"\nalarm, {room}, {device}, 1")
+				if first:
+					first = False
+					self.alarm_handle = subprocess.Popen(["omxplayer","--no-keys", "All_Megaman_X_WARNING.mp3"])
+					self.alarm_handle.wait()
+				# my intention is to prevent other process to run, but the wait alread do this. 
+				# i will keep both until i have a better idea
+				elif self.alarm_handle.pool():
+					self.alarm_handle = subprocess.Popen(["omxplayer","--no-keys", "All_Megaman_X_WARNING.mp3"])
+					self.alarm_handle.wait()
+
 		while(True):
 			first = True
 			for room,(pin, device) in self.gpio_in_device.items():
-				if GPIO.input(pin):
-					with open("log.csv", "a") as fp:
-						fp.write(f"\nalarm, {room}, {device}, 1")
-					if first:
-						first = False
-						self.alarm_handle = subprocess.Popen(["omxplayer","--no-keys", "All_Megaman_X_WARNING.mp3"])
-						self.alarm_handle.wait()
-					# my intention is to prevent other process to run, but the wait alread do this. 
-					# i will keep both until i have a better idea
-					elif self.alarm_handle.pool():
-						self.alarm_handle = subprocess.Popen(["omxplayer","--no-keys", "All_Megaman_X_WARNING.mp3"])
-						self.alarm_handle.wait()
+				alarm(room, GPIO.input(pin), device, first)
+			for room,(state, device) in self.esp_in_device.items():
+				alarm(room, state, device, first)
+				
 			time.sleep(0.5)
 
 	def print_device(self, screen):
