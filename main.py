@@ -5,6 +5,7 @@ import curses
 import time
 
 
+
 def salutation(screen):
 	screen.addstr(0, 0, "digite 0 para sair do programa")
 	screen.addstr(1, 0, "digite 1 para adicionar um novo dispositivo")
@@ -25,6 +26,7 @@ def input_str(screen, y_pos : int, lenght : int, instructions = "") -> str:
 if __name__ == "__main__":
 	try:
 		room_devices = RoomDevices()
+		polling = room_devices.run()
 		screen = curses.initscr()
 		curses.noecho()
 		screen.nodelay(True)
@@ -56,10 +58,16 @@ if __name__ == "__main__":
 				pass
 			flag = screen.getch()
 
-			time.sleep(0.3)
+			time.sleep(0.5)
 
 	except Exception as err:
 		curses.endwin()
+		polling.kill()
+		time.sleep(0.2)
+		polling.close()
 		raise err
 
 	curses.endwin()
+	polling.kill()
+	time.sleep(0.2)
+	polling.close()
