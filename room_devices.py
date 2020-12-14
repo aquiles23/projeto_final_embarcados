@@ -8,10 +8,12 @@ class RoomDevices():
 	alarm_handle : subprocess.Popen
 	inn : list
 	out : list
+	total_device : dict
 	def __init__(self):
 		GPIO.setmode(GPIO.BCM)
 		self.out = [17, 18] 
 		self.inn = [25, 26, 5, 6, 12, 16]
+		self.total_device = {}
 		self.gpio_in_device = {
 			"sala": (25, "sensor_presenca_1"),
 			"cozinha": (26, "sensor_presenca_2"),
@@ -48,9 +50,9 @@ class RoomDevices():
 
 	def print_device(self, screen):
 		# dict compreension
-		total_device = {k:(GPIO.input(v), z) for z, (v, k) in self.gpio_out_device.items() }
-		total_device.update({k:(GPIO.input(v), z) for z, (v, k) in self.gpio_in_device.items()})
-		for enum, (device, (value, room)) in enumerate(total_device.items()):
+		self.total_device.update({k:(GPIO.input(v), z) for z, (v, k) in self.gpio_out_device.items() })
+		self.total_device.update({k:(GPIO.input(v), z) for z, (v, k) in self.gpio_in_device.items()})
+		for enum, (device, (value, room)) in enumerate(self.total_device.items()):
 			screen.addstr(enum, 60, f"comodo: {room}; dispositivo: {device}; estado: {value}")
 
 	def device_set(self, name, state: bool):

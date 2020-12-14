@@ -56,9 +56,12 @@ if __name__ == "__main__":
 				room_devices.device_set(room_name, state)
 				
 			elif (flag == ord("3")):
-				room_devices.alarm_handle.terminate()
 				screen.clear()
-				screen.addstr(6, 0, "alarme desligado")
+				try:
+					room_devices.alarm_handle.terminate()
+					screen.addstr(6, 0, "alarme desligado")
+				except AttributeError:
+					screen.addstr(6, 0, "alarme não foi inicializado")
 			flag = screen.getch()
 
 			time.sleep(1)
