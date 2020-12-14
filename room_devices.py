@@ -28,21 +28,29 @@ class RoomDevices():
 
 	def polling(self):
 		while(True):
+			first = True
 			for room,(pin, device) in self.gpio_in_device.items():
 				if GPIO.input(pin):
 					with open("log.csv", "a") as fp:
 						fp.write(f"\nalarm, {room}, {device}, 1")
-					self.alarm_handle = subprocess.Popen(["omxplayer", "All_Megaman_X_WARNING.mp3"])
-					self.alarm_handle.wait()
+					if first:
+						first = False
+						self.alarm_handle = subprocess.Popen(["omxplayer","--no-keys", "All_Megaman_X_WARNING.mp3"])
+						self.alarm_handle.wait()
+					# my intention is to prevent other process to run, but the wait alread do this. 
+					# i will keep both until i have a better idea
+					elif self.alarm_handle.pool():
+						self.alarm_handle = subprocess.Popen(["omxplayer","--no-keys", "All_Megaman_X_WARNING.mp3"])
+						self.alarm_handle.wait()
 			time.sleep(0.5)
 
-	def print_device(self,screen):
+	def print_device(self, screen):
 		# dict compreension
 		total_device = {k:(GPIO.input(v), z) for k, (v, z) in self.gpio_out_device.items() }
 		for enum, (room, (value, device)) in enumerate(total_device.items()):
 			screen.addstr(enum, 60, f"comodo: {room}; dispositivo: {device}; estado: {value}")
 
-	def device_set(self,name,state: bool):
+	def device_set(self, name, state: bool):
 		if name in self.gpio_out_device:
 			GPIO.output(self.gpio_out_device[name][0], state)
 			with open("log.csv", "a") as fp:
