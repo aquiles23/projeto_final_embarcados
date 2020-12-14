@@ -5,14 +5,15 @@ import curses
 import time
 
 
-
 def salutation(screen):
 	screen.addstr(0, 0, "digite 0 para sair do programa")
 	screen.addstr(1, 0, "digite 1 para adicionar um novo dispositivo")
 	screen.addstr(2, 0, "digite 2 para setar o estado de um dispositivo")
 	screen.addstr(3, 0, "digite 3 para parar o alarme")
 
+
 def input_str(screen, y_pos : int, lenght : int, instructions = "") -> str:
+	screen.clear()
 	screen.nodelay(False)
 	curses.echo()
 	screen.addstr(y_pos - 1, 0, instructions)
@@ -43,12 +44,12 @@ if __name__ == "__main__":
 			if(flag == ord("1")):
 				pass
 			elif (flag == ord("2")):
-				room_name = input_str(screen, 7, 50, "digite o nome do cômodo")
+				room_name = input_str(screen, 2, 50, "digite o nome do cômodo")
 				state = bool(
 					int(
 						input_str(
 							screen,
-							9,
+							2,
 							1,
 							"digite seu estado(1 ou 0)")))
 				room_name = room_name.decode("utf-8")
@@ -56,10 +57,11 @@ if __name__ == "__main__":
 				
 			elif (flag == ord("3")):
 				room_devices.alarm_handle.terminate()
-				screen.addstr(6,0,"alarme desligado")
+				screen.clear()
+				screen.addstr(6, 0, "alarme desligado")
 			flag = screen.getch()
 
-			time.sleep(0.5)
+			time.sleep(1)
 
 	except Exception as err:
 		curses.endwin()
