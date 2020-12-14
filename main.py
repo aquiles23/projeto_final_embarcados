@@ -55,19 +55,19 @@ if __name__ == "__main__":
 				room_devices.device_set(room_name, state)
 				
 			elif (flag == ord("3")):
-				pass
+				room_devices.alarm_handle.kill()
 			flag = screen.getch()
 
 			time.sleep(0.5)
 
 	except Exception as err:
 		curses.endwin()
-		polling.kill()
-		time.sleep(0.2)
-		polling.close()
+		# polling.kill()
+		# time.sleep(0.2)
+		# polling.close()
 		raise err
 
 	curses.endwin()
-	polling.kill()
-	time.sleep(0.2)
-	polling.close()
+	# polling.kill()
+	# time.sleep(0.2)
+	# polling.close()

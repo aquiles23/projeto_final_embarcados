@@ -1,6 +1,7 @@
 import RPi.GPIO as GPIO
 import time
 from multiprocessing import Process, Pipe
+from threading import Thread
 import subprocess
 
 class RoomDevices():
@@ -31,6 +32,8 @@ class RoomDevices():
 				if GPIO.input(pin):
 					with open("log.csv", "a") as fp:
 						fp.write(f"\nalarm, {room}, {device}, 1")
+					self.alarm_handle = subprocess.Popen(["omxplayer", "All_Megaman_X_WARNING.mp3"])
+					self.alarm_handle.wait()
 			time.sleep(0.5)
 
 	def print_device(self,screen):
@@ -47,6 +50,6 @@ class RoomDevices():
 
 	def run(self):
 		p = Pipe()
-		polling = Process(target=self.polling)
+		polling = Thread(target=self.polling ,daemon=True)
 		polling.start()
 		return polling
