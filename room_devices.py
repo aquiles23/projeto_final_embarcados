@@ -1,6 +1,6 @@
 import RPi.GPIO as GPIO
 import time
-from multiprocessing import Process, Pipe
+# from multiprocessing import Process, Pipe
 from threading import Thread
 import subprocess
 
@@ -18,6 +18,8 @@ class RoomDevices():
 		self.out = [17, 18] 
 		self.inn = [25, 26, 5, 6, 12, 16]
 		self.total_device = {}
+		#self.esp_device = {}
+		self.esp_defined_device = {}
 		self.esp_in_device = {}
 		self.gpio_in_device = {
 			"sala": (25, "sensor_presenca_1"),
@@ -36,7 +38,7 @@ class RoomDevices():
 		GPIO.setup(self.out, GPIO.OUT)
 
 	def polling(self):
-		def alarm(room, state : int, device, first : bool):
+		def alarm(room, state : int, device):
 			if state:
 				with open("log.csv", "a") as fp:
 					fp.write(f"\nalarm, {room}, {device}, 1")
@@ -55,11 +57,10 @@ class RoomDevices():
 				"""
 
 		while(True):
-			first = True
 			for room,(pin, device) in self.gpio_in_device.items():
-				alarm(room, GPIO.input(pin), device, first)
+				alarm(room, GPIO.input(pin), device)
 			for room,(state, device) in self.esp_in_device.items():
-				alarm(room, state, device, first)
+				alarm(room, state, device)
 				
 			time.sleep(0.5)
 
@@ -69,6 +70,7 @@ class RoomDevices():
 		self.total_device.update({k:(GPIO.input(v), z) for z, (v, k) in self.gpio_in_device.items()})
 		for enum, (device, (value, room)) in enumerate(self.total_device.items()):
 			screen.addstr(enum, 60, f"comodo: {room}; dispositivo: {device}; estado: {value}")
+		return len(self.total_device)
 
 	def device_set(self, name, state: bool):
 		if name in self.gpio_out_device:
@@ -76,8 +78,7 @@ class RoomDevices():
 			with open("log.csv", "a") as fp:
 				fp.write(f"\noutput, {name}, {self.gpio_out_device[name][1]}, {state}")
 
-	def run(self):
-		p = Pipe()
+	def run_polling(self):
 		polling = Thread(target=self.polling ,daemon=True)
 		polling.start()
 		return polling

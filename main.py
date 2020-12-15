@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 from sensor import sensor
 from room_devices import RoomDevices
+from mqtt import mqtt
+import threading
 import curses
 import time
 
@@ -21,13 +23,13 @@ def input_str(screen, y_pos : int, lenght : int, instructions = "") -> str:
 	string = screen.getstr(y_pos, 0, lenght)
 	curses.noecho()
 	screen.nodelay(True)
-	return string
+	return string.decode("utf-8")
 
 
 if __name__ == "__main__":
 	try:
 		room_devices = RoomDevices()
-		polling = room_devices.run()
+		polling = room_devices.run_polling()
 		screen = curses.initscr()
 		curses.noecho()
 		screen.nodelay(True)
@@ -42,7 +44,24 @@ if __name__ == "__main__":
 			screen.addstr(4, 0, f"cômodo central. Humidade: {hum} Temperatura {temp}")
 
 			if(flag == ord("1")):
-				pass
+				room = input_str(screen,2,50,"digite o nome do cômodo")
+				input_device = input_str(screen,2,50,"digite o nome do dispositivo de entrada")
+				output_device = input_str(screen,2,50,"digite o nome do dispositivo de saída")
+				room_devices.esp_defined_device.update({
+					room : {
+						"in": input_device,
+						"out": output_device 
+					}
+				})
+				flag_device = input_str(screen,2,1,"digite 1 para definir o dispositivo ou 0 para usar o padrão")
+				if(int(flag_device)):
+					matricula = input_str(screen,2,1,"digite a matricula")
+					mac = input_str(screen,2,1,"digite o endereço mac")
+					threading.Thread(target=mqtt, args=(room_devices,screen,matricula,mac), daemon=True)
+				else:
+					threading.Thread(target=mqtt, args=(room_devices, screen), daemon=True)
+
+
 			elif (flag == ord("2")):
 				room_name = input_str(screen, 2, 50, "digite o nome do cômodo")
 				state = bool(
@@ -52,7 +71,6 @@ if __name__ == "__main__":
 							2,
 							1,
 							"digite seu estado(1 ou 0)")))
-				room_name = room_name.decode("utf-8")
 				room_devices.device_set(room_name, state)
 				
 			elif (flag == ord("3")):
@@ -68,6 +86,17 @@ if __name__ == "__main__":
 
 	except Exception as err:
 		curses.endwin()
+		try:
+			# dealocating memory
+			room_devices.alarm_handle.close()
+		except:
+			pass
+		# it's easier to debug raising the error
 		raise err
 
 	curses.endwin()
+	try:
+		# dealocating memory
+		room_devices.alarm_handle.close()
+	except:
+		pass

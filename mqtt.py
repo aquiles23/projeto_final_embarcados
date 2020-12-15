@@ -8,7 +8,7 @@ from room_devices import RoomDevices
 
 global msg
 
-def mqtt(matricula= "160010195", mac="8c:aa:b5:8b:52:e0", room_devices: RoomDevices, screen):
+def mqtt(room_devices: RoomDevices, screen, matricula="160010195", mac="8c:aa:b5:8b:52:e0"):
 	def on_connect(client, userdata, flags, rc):
 		if rc == 0:
 			pass
@@ -26,12 +26,28 @@ def mqtt(matricula= "160010195", mac="8c:aa:b5:8b:52:e0", room_devices: RoomDevi
 
 	def state_message(client, userdata, message):
 		message = json.loads(message.payload.decode("utf-8"))
-		room_devices.total_device.update({message.get("device"):(
-			message.get("state"),
-			message.get("room"))})
-		room_devices.esp_in_device.update({message.get("device"):(
-			message.get("state"),
-			message.get("room"))})
+		room, input_value, output_value = message.values()
+		input_device = room_devices.esp_defined_device.get(room).get("in")
+		output_device = room_devices.esp_defined_device.get(room).get("out")
+		""" room_devices.esp_device.update({
+			room:{
+				"in": input_value,
+				"out": output_value
+			}
+		}) """
+		room_devices.esp_in_device({
+			room:(
+				input_value,
+				input_device
+			)
+		})
+		room_devices.total_device.update({
+			input_device: (
+				input_value,
+				room
+			)
+		})
+		
 
 
 	# escolha = int(input("escolha 1 para adicionar novo device\n2 para tananan"))
