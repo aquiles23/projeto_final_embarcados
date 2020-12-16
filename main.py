@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 from sensor import sensor
 from room_devices import room_devices
-from mqtt import Mqtt
+from mqtt import mqtt
 # from instance import room_devices
-import threading
+from threading import Thread
 import curses
 import time
 
@@ -26,7 +26,7 @@ def input_str(screen, y_pos : int, lenght : int, instructions = "") -> str:
 	screen.nodelay(True)
 	return string.decode("utf-8")
 
-mqtt = Mqtt()
+# mqtt = Mqtt()
 
 if __name__ == "__main__":
 
@@ -61,9 +61,11 @@ if __name__ == "__main__":
 				if(int(flag_device)):
 					matricula = input_str(screen,2,1,"digite a matricula")
 					mac = input_str(screen,2,1,"digite o endereço mac")
-					mqtt.run_init(screen,room,matricula,mac,y_pos)
+					thread = Thread(target=mqtt,args = (screen,room,y_pos,matricula,mac))
+					thread.start()
 				else:
-					mqtt.run_init(screen,room,y_pos)
+					thread = Thread(target=mqtt,daemon=True,args = (screen,room,y_pos))
+					thread.start()
 
 
 			elif (flag == ord("2")):
