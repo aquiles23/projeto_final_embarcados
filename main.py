@@ -26,8 +26,10 @@ def input_str(screen, y_pos : int, lenght : int, instructions = "") -> str:
 	screen.nodelay(True)
 	return string.decode("utf-8")
 
+mqtt = Mqtt()
+
 if __name__ == "__main__":
-	mqtt = Mqtt()
+
 	try:
 		polling = room_devices.run_polling()
 		screen = curses.initscr()

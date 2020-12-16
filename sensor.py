@@ -3,7 +3,6 @@ import bme280
 import time
 
 def sensor():
-
 	porta_i2c = 1
 	endereco = 0x76
 

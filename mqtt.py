@@ -36,10 +36,16 @@ class Mqtt():
 					"out": output_value
 				}
 			}) """
-			room_devices.esp_in_device({
+			room_devices.esp_in_device.update({
 				room:(
 					input_value,
 					input_device
+				)
+			})
+			room_devices.esp_out_device.update({
+				room:(
+					output_value,
+					output_device
 				)
 			})
 			room_devices.total_device.update({
@@ -52,12 +58,13 @@ class Mqtt():
 
 		device = f"fse2020/{matricula}/dispositivos/{mac}"
 
-		self.client = mqtt.Client("publisher")
+		self.client = mqtt.Client(room)
 		self.client.on_connect = on_connect
 		self.client.on_publish = on_publish
 		self.client.connect(broker)
 
-		if(not self.client.publish(device, json.dumps(room), 2)):
+		# most important message, so i'm using qos 2
+		if(not self.client.publish(device, json.dumps(room),2)):
 			raise Exception(f"Failed to send message to topic {device}")
 
 		# wait for esp subscribe in mqtt?
@@ -75,10 +82,12 @@ class Mqtt():
 		self.client.subscribe(umid_topic)
 		self.client.subscribe(state_topic)
 
+		room_devices.room_esp.update({room:device})
 		# program will not shut down
 		self.client.loop_forever()
 
-	def run_init(self, *args, **kwargs):
+
+	def run_init(self, *args):
 		runner = Thread(target=self.init, daemon = True,args = args)
 		runner.start()
 		return runner

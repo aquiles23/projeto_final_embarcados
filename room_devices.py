@@ -3,15 +3,20 @@ import time
 # from multiprocessing import Process, Pipe
 from threading import Thread
 import subprocess
+import paho.mqtt.client as mqtt
+import json
 
 class RoomDevices():
 	alarm_handle : subprocess.Popen
 	inn : list
 	out : list
+	room_esp : dict
 	gpio_in_device : dict
 	esp_in_device : dict
+	esp_out_device : dict
 	gpio_out_device : dict
 	total_device : dict
+
 	
 	def __init__(self):
 		GPIO.setmode(GPIO.BCM)
@@ -21,6 +26,8 @@ class RoomDevices():
 		#self.esp_device = {}
 		self.esp_defined_device = {}
 		self.esp_in_device = {}
+		self.esp_out_device = {}
+		self.room_esp = {}
 		self.gpio_in_device = {
 			"sala": (25, "sensor_presenca_1"),
 			"cozinha": (26, "sensor_presenca_2"),
@@ -44,17 +51,6 @@ class RoomDevices():
 					fp.write(f"\nalarm, {room}, {device}, 1")
 					self.alarm_handle = subprocess.Popen(["omxplayer","--no-keys", "All_Megaman_X_WARNING.mp3","&"])
 					self.alarm_handle.wait()
-				""" 
-				if first:
-					first = False
-					self.alarm_handle = subprocess.Popen(["omxplayer","--no-keys", "All_Megaman_X_WARNING.mp3"])
-					self.alarm_handle.wait()
-				# my intention is to prevent other process to run, but the wait alread do this. 
-				# i will keep both until i have a better idea
-				elif self.alarm_handle.pool():
-					self.alarm_handle = subprocess.Popen(["omxplayer","--no-keys", "All_Megaman_X_WARNING.mp3"])
-					self.alarm_handle.wait() 
-				"""
 
 		while(True):
 			for room,(pin, device) in self.gpio_in_device.items():
@@ -75,13 +71,20 @@ class RoomDevices():
 	def device_set(self, name, state: bool):
 		if name in self.gpio_out_device:
 			GPIO.output(self.gpio_out_device[name][0], state)
+		elif name in self.esp_out_device:
+			client = mqtt.Client("set_output")
+			broker = "mqtt.eclipseprojects.io"
+			client.connect(broker)
+			if(not self.client.publish(room_esp.get(name), json.dumps(state))):
+				raise Exception(f"Failed to send message to topic {device}")
 			with open("log.csv", "a") as fp:
-				fp.write(f"\noutput, {name}, {self.gpio_out_device[name][1]}, {state}")
+				fp.write(f"\noutput, {name}, {self.esp_out_device.get(name)[1]}, {state}")
+			# mqtt.publish(state)
 
 	def run_polling(self):
 		polling = Thread(target=self.polling ,daemon=True)
 		polling.start()
 		return polling
 
-# i'm import the instace over the class
+# i'm import the instace instead of importing the class
 room_devices = RoomDevices()
