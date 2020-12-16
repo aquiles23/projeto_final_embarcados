@@ -42,7 +42,7 @@ class RoomDevices():
 			if state:
 				with open("log.csv", "a") as fp:
 					fp.write(f"\nalarm, {room}, {device}, 1")
-					self.alarm_handle = subprocess.Popen(["omxplayer","--no-keys", "All_Megaman_X_WARNING.mp3"])
+					self.alarm_handle = subprocess.Popen(["omxplayer","--no-keys", "All_Megaman_X_WARNING.mp3","&"])
 					self.alarm_handle.wait()
 				""" 
 				if first:
@@ -82,3 +82,6 @@ class RoomDevices():
 		polling = Thread(target=self.polling ,daemon=True)
 		polling.start()
 		return polling
+
+# i'm import the instace over the class
+room_devices = RoomDevices()

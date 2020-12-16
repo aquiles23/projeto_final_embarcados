@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 from sensor import sensor
-from room_devices import RoomDevices
-from mqtt import mqtt
+from room_devices import room_devices
+from mqtt import Mqtt
+# from instance import room_devices
 import threading
 import curses
 import time
@@ -25,10 +26,9 @@ def input_str(screen, y_pos : int, lenght : int, instructions = "") -> str:
 	screen.nodelay(True)
 	return string.decode("utf-8")
 
-
 if __name__ == "__main__":
+	mqtt = Mqtt()
 	try:
-		room_devices = RoomDevices()
 		polling = room_devices.run_polling()
 		screen = curses.initscr()
 		curses.noecho()
@@ -57,9 +57,9 @@ if __name__ == "__main__":
 				if(int(flag_device)):
 					matricula = input_str(screen,2,1,"digite a matricula")
 					mac = input_str(screen,2,1,"digite o endereço mac")
-					threading.Thread(target=mqtt, args=(room_devices,screen,matricula,mac), daemon=True)
+					mqtt.run_init(screen,room,matricula,mac)
 				else:
-					threading.Thread(target=mqtt, args=(room_devices, screen), daemon=True)
+					mqtt.run_init(screen,room)
 
 
 			elif (flag == ord("2")):
