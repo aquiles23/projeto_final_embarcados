@@ -6,10 +6,11 @@ import time
 import curses
 from room_devices import room_devices
 
-
+# i made a class hopping that i could pass atributes to other module
+# i was wrong
 class Mqtt():
 	client : mqtt.Client
-	def init(self,screen, room:str, matricula="160010195", mac="8c:aa:b5:8b:52:e0"):
+	def init(self,screen, room:str,y_pos: int, matricula="160010195", mac="8c:aa:b5:8b:52:e0"):
 		def on_connect(client, userdata, flags, rc):
 			if rc == 0:
 				pass
@@ -20,10 +21,19 @@ class Mqtt():
 			pass
 
 		def temp_message(client, userdata, message):
-			msg = json.loads(message.payload.decode("utf-8"))
+			message = json.loads(message.payload.decode("utf-8"))
+			screen.addstr(
+				y_pos,
+				0,
+				f"{message.get('room')}: temperatura : {message.get('temp')}")
 
 		def umid_message(client, userdata, message):
-			msg = json.loads(message.payload.decode("utf-8"))
+			message = json.loads(message.payload.decode("utf-8"))
+			screen.addstr(
+				y_pos+1,
+				0,
+				f"{message.get('room')}: umidade : {message.get('humidi')}")
+
 
 		def state_message(client, userdata, message):
 			message = json.loads(message.payload.decode("utf-8"))
