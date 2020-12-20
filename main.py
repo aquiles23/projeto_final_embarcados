@@ -59,9 +59,9 @@ if __name__ == "__main__":
 				flag_device = input_str(screen,2,1,"digite 1 para definir o dispositivo ou 0 para usar o padrão")
 				y_pos += 1
 				if(int(flag_device)):
-					matricula = input_str(screen,2,1,"digite a matricula")
-					mac = input_str(screen,2,1,"digite o endereço mac")
-					thread = Thread(target=mqtt,args = (screen,room,y_pos,matricula,mac))
+					matricula = input_str(screen,2,50,"digite a matricula")
+					mac = input_str(screen,2,50,"digite o endereço mac")
+					thread = Thread(target=mqtt,args = (screen,room,y_pos,matricula,mac), daemon=True)
 					thread.start()
 				else:
 					thread = Thread(target=mqtt,daemon=True,args = (screen,room,y_pos))
